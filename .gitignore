@@ -4,3 +4,4 @@ node_modules
 temp
 test_files
 package-lock.json
+.DS_Store
