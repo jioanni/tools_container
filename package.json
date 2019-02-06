@@ -1,5 +1,5 @@
 {
-  "name": "tools_redux",
+  "name": "tools",
   "version": "1.0.0",
   "description": "",
   "main": "run.js",
@@ -9,6 +9,7 @@
     "body-parser": "^1.18.3",
     "del": "^3.0.0",
     "express": "^4.16.3",
+    "flat-raml": "^1.2.3",
     "fury-cli": "^0.7.0",
     "highcharts-export-server": "^2.0.13",
     "multer": "^1.4.1",
