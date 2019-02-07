@@ -29,6 +29,6 @@
     "start-dev": "nodemon app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Simone Pezzano/Jason Ioannides",
   "license": "ISC"
 }

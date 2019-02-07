@@ -1,43 +1,38 @@
 const router = require('express').Router()
 const axios = require('axios')
-const uuid = require('uuid/v4')
-const AdmZip = require('adm-zip')
 const del = require('del')
 const multer = require('multer')
-const upload = multer({ dest: 'temp'})
-const utilFunctions = require('../utility')
-const fs = require('fs')
+const ramlFlatten = require('../raml-flatten')
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'temp/')
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname)
+    }
+  })
+   
+const upload = multer({ storage: storage })
 
 
 router.post('/', upload.single('file'), async (req, res, next) => {
     try{
-        const id = uuid()
-        await utilFunctions.readFileAsync(req.file.path)
-        .then((data) => {
-            const zip = new AdmZip(data)
-            const zipEntries = zip.getEntries()
-            let writeStream = fs.createWriteStream(`temp/${id}.raml`)
-            del(req.file.path)
-            console.log(`Deleting temporary file ${req.file.path} (Attachment)`)
 
-            
-            zipEntries.forEach((zipEntry) => {
-                    writeStream.write(zipEntry.getData().toString('utf8'))
-            })
-        })
-    
-        await utilFunctions.readFileAsync(`temp/${id}.raml`)
-        .then((data) => utilFunctions.ramlToOas20.convertData(data.toString('utf8')))
-        .then((swagger) => {
-            return axios.post(`http://localhost:${process.env.PORT || 7801}/fury`, JSON.parse(swagger))
-        })
-        .then(result => res.send(result.data))
-        .catch(() => res.status(500).send("Cannot parse RAML archive (Invalid)"))
-        
-        del(`temp/${id}.raml`)
-        console.log(`Deleting temporary file temp/${id}.raml (RAML)`)
+        const swagger = await ramlFlatten.ramlFlattener(req.file.path, 'temp')
+        del(req.file.path)
+        const result = await axios.post(`http://localhost:${process.env.PORT || 7801}/fury`, JSON.parse(swagger.data))
+        del(swagger.filename)
+        res.send(result.data)
+
+
     } catch(err){ 
-        res.status(500).send("Cannot parse RAML archive. (Internal Error)")
+        res.status(500).send(
+            {
+                "Status" : 500, 
+                "Message" : "Internal Server Error (Invalid RAML)"
+            }
+        )
     }
 })
 
