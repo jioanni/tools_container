@@ -107,6 +107,4 @@ const processRaml = (req) => {
     return ramlToOas20.convertData(req.rawBody)
 }
 
-const readFileAsync = util.promisify(fs.readFile)
-
-module.exports = {rawBodySaver, processInput, processHighcharts, processRaml, readFileAsync, ramlToOas20}
+module.exports = { rawBodySaver, processInput, processHighcharts, processRaml, ramlToOas20 }

@@ -1,10 +1,14 @@
-from node:7.7.2 
+FROM node:7.7
 RUN mkdir /tools
-RUN mkdir /tools/node_modules
-WORKDIR /tools
-COPY ./node_modules/ /tools/node_modules/
+COPY package*.json ./
+RUN npm install --only=production
+COPY . .
+# RUN mkdir /tools/node_modules
+# WORKDIR /tools
+# COPY ./node_modules/ /tools/node_modules/
 
-COPY run.js /tools/
+# COPY app.js /tools/
 
 EXPOSE 7801
-ENTRYPOINT ["node", "run.js"]
+# ENTRYPOINT ["node", "app.js"]
+CMD ["npm", "start"]
